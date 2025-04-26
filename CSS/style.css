@@ -1,0 +1,68 @@
+/* style.css */
+
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f9f9f9;
+    color: #333;
+  }
+  
+  /* Contenedor del mapa */
+  #mapa {
+    width: 800px;
+    height: 600px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: 1rem;
+  }
+  
+  /* Opciones del select */
+  label, select {
+    font-size: 1rem;
+    margin-right: 0.5rem;
+  }
+  select {
+    padding: 0.4rem 0.6rem;
+  }
+  
+  /* Estilos de los estados en el SVG */
+  .estado {
+    fill: #ddd;
+    stroke: #fff;
+    stroke-width: 0.5px;
+    transition: fill 0.2s ease;
+  }
+  .estado:hover {
+    fill: #bbb;
+    cursor: pointer;
+  }
+  /* Estado seleccionado */
+  .seleccionado {
+    fill: orange !important;
+  }
+  
+  /* Panel de información */
+  #info {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  #info h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+  }
+  #stats {
+    line-height: 1.5;
+  }
+  
+  /* Responsividad básica */
+  @media (max-width: 900px) {
+    #mapa {
+      width: 100%;
+      height: auto;
+    }
+  }
+  

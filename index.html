@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mapa Interactivo Prouni</title>
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="CSS/style.css" />
+
+  <!-- D3.js -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+</head>
+<body>
+
+  <h1>Mapa Interactivo Prouni</h1>
+
+  <!-- Selector de estado -->
+  <div class="controls">
+    <label for="sel-uf">Selecciona un estado:</label>
+    <select id="sel-uf">
+      <option value="--">--</option>
+    </select>
+  </div>
+
+  <!-- Contenedor del mapa -->
+  <div id="mapa"></div>
+
+  <!-- Panel de información -->
+  <div id="info">
+    <h2 id="titulo-estado">—</h2>
+    <p id="stats">Aquí aparecerán las estadísticas.</p>
+  </div>
+
+  <!-- Tu script D3 -->
+  <script src="js/script.js"></script>
+</body>
+</html>
