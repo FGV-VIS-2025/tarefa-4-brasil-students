@@ -5,11 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BraVis Student Scholarship</title>
     <link rel="stylesheet" href="css/styles.css">
+    <!-- Asegurar que la ruta a la hoja de estilos sea correcta -->
 </head>
+
+<script>
+  // Script para verificar la carga del CSV
+  setTimeout(function() {
+    // Intentar cargar el CSV directamente
+    d3.csv("data/data.csv")
+      .then(function(data) {
+        console.log("Archivo CSV cargado correctamente:", data.length, "registros");
+        console.log("Muestra del primer registro:", data[0]);
+        alert("CSV cargado: " + data.length + " registros. Revisa la consola para más detalles.");
+      })
+      .catch(function(error) {
+        console.error("Error al cargar el CSV:", error);
+        alert("Error al cargar el CSV. Revisa la consola para más detalles.");
+      });
+  }, 1000);
+</script>
+
 <body>
     <div class="main-container">
         <!-- Título principal -->
-        <h1>BraVis Student Scolarship</h1>
+        <h1>BraVis Student Scholarship</h1>
         
         <!-- Controles de selección -->
         <div class="controls">
@@ -77,19 +96,28 @@
             <span>Theme: Light</span>
         </div>
         
+        <!-- Estado de carga -->
+        <div id="loading-status" style="display: none; text-align: center; padding: 10px; margin-bottom: 15px; background-color: #f8f9fa; border-radius: 4px;">
+            <span>Cargando datos...</span>
+        </div>
+        
         <!-- Mapa de Brasil -->
         <div id="map-container">
             <!-- El mapa se renderizará aquí con D3.js -->
+            <div class="map-loading" style="text-align: center; padding: 150px 0;">
+                <p>Cargando mapa de Brasil...</p>
+            </div>
         </div>
         
         <!-- Información del estado -->
         <div class="state-info">
-            <h2 id="estado-title">Estado: <span id="estado-nombre"></span></h2>
+            <h2 id="estado-title">Estado: <span id="estado-nombre">Ninguno seleccionado</span></h2>
             <p>Total becas: <span id="total-becas">0</span></p>
             <div id="top-universidades">
                 <h3>Top 5 universidades:</h3>
                 <ul id="lista-universidades">
                     <!-- Las universidades se cargarán aquí -->
+                    <li>Seleccione un estado para ver información</li>
                 </ul>
             </div>
         </div>
@@ -98,8 +126,12 @@
         <div class="charts-row">
             <!-- Gráfico de barras -->
             <div id="bar-chart-container">
-                <h3>Porcentage estudantes por turno Estado <span id="estado-barchart"></span></h3>
-                <div id="bar-chart"></div>
+                <h3>Porcentage estudantes por turno Estado <span id="estado-barchart">Ninguno seleccionado</span></h3>
+                <div id="bar-chart">
+                    <div class="chart-loading" style="text-align: center; padding: 100px 0;">
+                        <p>Seleccione un estado para visualizar datos</p>
+                    </div>
+                </div>
             </div>
             
             <!-- Gráficos circulares -->
@@ -107,13 +139,13 @@
                 <h3>Resumen otras categorias</h3>
                 <div class="pie-charts">
                     <div id="pie-chart1">
-                        <h4>Variable1</h4>
+                        <h4>Tipo de Beca</h4>
                     </div>
                     <div id="pie-chart2">
-                        <h4>Variable2</h4>
+                        <h4>Género</h4>
                     </div>
                     <div id="pie-chart3">
-                        <h4>Variable3</h4>
+                        <h4>Etnia</h4>
                     </div>
                 </div>
             </div>
@@ -122,18 +154,55 @@
         <!-- NUEVO: Gráfico con estilo hecho a mano -->
         <div class="chart-container" id="hand-drawn-chart-container">
             <h3>Análisis Comparativo de Estudiantes</h3>
-            <div id="hand-drawn-chart"></div>
+            <div id="hand-drawn-chart">
+                <div class="chart-loading" style="text-align: center; padding: 150px 0;">
+                    <p>Seleccione un estado para visualizar datos</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensaje de estado de datos -->
+        <div id="data-status" style="text-align: center; margin-top: 20px; padding: 10px; font-style: italic; color: #666;">
+            <!-- Mensajes sobre el estado de los datos se mostrarán aquí -->
         </div>
     </div>
 
     <!-- Scripts -->
+    <!-- Bibliotecas D3.js -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://d3js.org/d3-geo.v3.min.js"></script>
     <script src="https://d3js.org/topojson.v3.min.js"></script>
+    
+    <!-- Scripts de la aplicación -->
     <script src="js/main.js"></script>
     <script src="js/map.js"></script>
     <script src="js/barChart.js"></script>
     <script src="js/pieCharts.js"></script>
     <script src="js/handDrawnChart.js"></script>
+    
+    <!-- Script para manejo de errores -->
+    <script>
+        // Manejador de errores global
+        window.addEventListener('error', function(event) {
+            console.error('Error capturado:', event.error);
+            document.getElementById('data-status').innerHTML = 
+                `<div style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; border-radius: 4px;">
+                    Error en la aplicación: ${event.error.message}. 
+                    <br>Intente recargar la página o contacte al administrador.
+                </div>`;
+            return false;
+        });
+        
+        // Verificar si D3 está disponible
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof d3 === 'undefined') {
+                document.getElementById('data-status').innerHTML = 
+                    `<div style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; border-radius: 4px;">
+                        Error: No se pudo cargar la biblioteca D3.js. 
+                        <br>Verifique su conexión a Internet e intente recargar la página.
+                    </div>`;
+            }
+        });
+    </script>
 </body>
 </html>

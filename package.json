@@ -1,0 +1,21 @@
+{
+	"devDependencies": {
+		"@sveltejs/adapter-auto": "^2.0.0",
+		"@sveltejs/adapter-static": "^2.0.3",
+		"@sveltejs/kit": "^1.5.0",
+		"elocuent": "^0.0.4",
+		"svelte": "^4.2.19",
+		"vite": "^4.3.0"
+	},
+	"scripts": {
+		"dev": "vite dev",
+		"prebuild": "npx elocuent -d static,src -o static/loc.csv",
+		"build": "vite build",
+		"preview": "vite preview"
+	},
+	"type": "module",
+	"dependencies": {
+		"@floating-ui/dom": "^1.6.13",
+		"d3": "^7.9.0"
+	}
+}

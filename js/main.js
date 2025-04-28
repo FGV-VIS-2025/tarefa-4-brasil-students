@@ -8,31 +8,49 @@ let selectedCategory = "NOME_TURNO_CURSO_BOLSA"; // Categoría seleccionada (val
 // Inicializar la aplicación cuando se carga la página
 document.addEventListener("DOMContentLoaded", function() {
     // Cargar datos geográficos
-    d3.json("data/brazil-states.geojson").then(function(geo) {
-        geoData = geo;
-        
-        // Cargar datos de estudiantes
-        d3.csv("data/data.csv").then(function(data) {
-            // Convertir datos numéricos a números
+// En main.js, busca la parte donde se cargan los datos y sustitúyela por:
+        d3.json("data/brazil-states.geojson")
+        .catch(() => d3.json("../data/brazil-states.geojson"))
+        .catch(() => d3.json("./data/brazil-states.geojson"))
+        .catch(() => d3.json("https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson"))
+        .then(function(geo) {
+            geoData = geo;
+            console.log("Datos geográficos cargados correctamente");
+            
+            // Intentar cargar datos de estudiantes desde varias rutas posibles
+            return d3.csv("data/data.csv")
+            .catch(() => d3.csv("../data/data.csv"))
+            .catch(() => d3.csv("./data/data.csv"))
+            .catch(() => {
+                console.warn("No se pudo cargar el archivo CSV desde ninguna ruta");
+                return [];
+            });
+        })
+        .then(function(data) {
+            if (data && data.length > 0) {
+            console.log("Datos cargados correctamente:", data.length, "registros");
+            console.log("Campos disponibles:", Object.keys(data[0]));
+            
             data.forEach(d => {
                 d.ANO_CONCESSAO_BOLSA = +d.ANO_CONCESSAO_BOLSA;
-                // Otros campos numéricos si los hay
             });
             
             globalData = data;
+            } else {
+            console.warn("No hay datos o el archivo está vacío. Usando datos de muestra.");
+            globalData = createSampleData();
+            }
             
-            // Configurar controles
             setupControls();
-            
-            // Inicializar visualizaciones
             updateVisualizations();
-        }).catch(function(error) {
-            console.error("Error al cargar datos de estudiantes:", error);
+        })
+        .catch(function(error) {
+            console.error("Error completo:", error);
+            alert("Error al cargar datos. Usando datos de muestra.");
+            globalData = createSampleData();
+            setupControls();
+            updateVisualizations();
         });
-    }).catch(function(error) {
-        console.error("Error al cargar datos geográficos:", error);
-    });
-});
 
 /**
  * Configura los controles de selección
@@ -152,4 +170,3 @@ function updateStateInfo(data, state, year) {
         li.textContent = "No hay datos disponibles";
         listaUniversidades.appendChild(li);
     }
-}
