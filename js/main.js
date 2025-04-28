@@ -1,172 +1,219 @@
+// js/main.js
+
+/**
+ * main.js
+ * Script principal para la aplicación BraVis Student Scholarship
+ * Este archivo maneja la carga de datos y la coordinación entre visualizaciones
+ */
+
 // Variables globales
-let globalData = [];     // Datos de estudiantes
-let geoData = null;      // Datos geográficos de Brasil
-let selectedState = "";  // Estado seleccionado actualmente
-let selectedYear = "2015"; // Año seleccionado (valor predeterminado)
-let selectedCategory = "NOME_TURNO_CURSO_BOLSA"; // Categoría seleccionada (valor predeterminado)
+let globalData = [];           // Datos de estudiantes
+let geoData = null;            // GeoJSON de Brasil
+let selectedState = "";        // Estado seleccionado
+let selectedYear = "2015";     // Año seleccionado por defecto
+let selectedCategory = "NOME_TURNO_CURSO_BOLSA"; // Categoría por defecto
 
-// Inicializar la aplicación cuando se carga la página
-document.addEventListener("DOMContentLoaded", function() {
-    // Cargar datos geográficos
-// En main.js, busca la parte donde se cargan los datos y sustitúyela por:
-        d3.json("data/brazil-states.geojson")
-        .catch(() => d3.json("../data/brazil-states.geojson"))
-        .catch(() => d3.json("./data/brazil-states.geojson"))
-        .catch(() => d3.json("https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson"))
-        .then(function(geo) {
-            geoData = geo;
-            console.log("Datos geográficos cargados correctamente");
-            
-            // Intentar cargar datos de estudiantes desde varias rutas posibles
-            return d3.csv("data/data.csv")
-            .catch(() => d3.csv("../data/data.csv"))
-            .catch(() => d3.csv("./data/data.csv"))
-            .catch(() => {
-                console.warn("No se pudo cargar el archivo CSV desde ninguna ruta");
-                return [];
-            });
-        })
-        .then(function(data) {
-            if (data && data.length > 0) {
-            console.log("Datos cargados correctamente:", data.length, "registros");
-            console.log("Campos disponibles:", Object.keys(data[0]));
-            
-            data.forEach(d => {
-                d.ANO_CONCESSAO_BOLSA = +d.ANO_CONCESSAO_BOLSA;
-            });
-            
-            globalData = data;
-            } else {
-            console.warn("No hay datos o el archivo está vacío. Usando datos de muestra.");
-            globalData = createSampleData();
-            }
-            
-            setupControls();
-            updateVisualizations();
-        })
-        .catch(function(error) {
-            console.error("Error completo:", error);
-            alert("Error al cargar datos. Usando datos de muestra.");
-            globalData = createSampleData();
-            setupControls();
-            updateVisualizations();
+// Inicialización cuando el DOM esté listo
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("▶ Aplicación inicializada");
+
+  // 1) Cargar GeoJSON de Brasil
+  d3.json("data/brazil-states.geojson")
+    .then(geo => {
+      geoData = geo;
+      console.log("✅ Geodatos cargados");
+      return d3.csv("data/data.csv");
+    })
+    // 2) Cargar CSV de estudiantes
+    .then(data => {
+      if (data && data.length > 0) {
+        console.log(`✅ ${data.length} registros de estudiantes cargados`);
+        // Convertir campos numéricos
+        data.forEach(d => {
+          d.ANO_CONCESSAO_BOLSA = +d.ANO_CONCESSAO_BOLSA;
         });
+        globalData = data;
+      } else {
+        console.warn("⚠ CSV vacío: usando datos de muestra");
+        globalData = createSampleData();
+      }
+    })
+    .catch(err => {
+      console.error("❌ Error cargando datos:", err);
+      console.log("▶ Cargando datos de muestra y Geo alternativo...");
+      globalData = createSampleData();
+      // Geo alternativo remoto
+      return d3.json(
+        "https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson"
+      )
+      .then(geo => {
+        geoData = geo;
+      })
+      .catch(() => {
+        console.warn("⚠ No se pudo cargar Geo alternativo");
+      });
+    })
+    .finally(() => {
+      setupControls();
+      updateVisualizations();
+      addDebugButton();
+    });
+});
 
-/**
- * Configura los controles de selección
- */
+// Configura los selects y sus listeners
 function setupControls() {
-    // Obtener elementos del DOM
-    const estadoSelector = document.getElementById("estado-selector");
-    const yearSelector = document.getElementById("year-selector");
-    const categorySelector = document.getElementById("category-selector");
-    
-    // Agregar eventos de cambio
-    estadoSelector.addEventListener("change", function() {
-        selectedState = this.value;
-        updateVisualizations();
-    });
-    
-    yearSelector.addEventListener("change", function() {
-        selectedYear = this.value;
-        updateVisualizations();
-    });
-    
-    categorySelector.addEventListener("change", function() {
-        selectedCategory = this.value;
-        updateVisualizations();
-    });
-    
-    // Establecer valores iniciales
-    selectedState = estadoSelector.value;
-    selectedYear = yearSelector.value;
-    selectedCategory = categorySelector.value;
+  const estadoSel   = document.getElementById("estado-selector");
+  const yearSel     = document.getElementById("year-selector");
+  const categorySel = document.getElementById("category-selector");
+
+  estadoSel.addEventListener("change", () => {
+    selectedState = estadoSel.value;
+    updateVisualizations();
+  });
+  yearSel.addEventListener("change", () => {
+    selectedYear = yearSel.value;
+    updateVisualizations();
+  });
+  categorySel.addEventListener("change", () => {
+    selectedCategory = categorySel.value;
+    updateVisualizations();
+  });
+
+  // Valores iniciales
+  selectedState    = estadoSel.value;
+  selectedYear     = yearSel.value;
+  selectedCategory = categorySel.value;
+  console.log("Valores iniciales:", { selectedState, selectedYear, selectedCategory });
 }
 
-/**
- * Actualiza todas las visualizaciones basadas en las selecciones actuales
- */
+// Llama a todas las actualizaciones de visualizaciones
 function updateVisualizations() {
-    // Actualizar el mapa
+  console.log("🔄 updateVisualizations", { selectedState, selectedYear, selectedCategory });
+
+  // Mapa
+  if (geoData) {
     updateMap(geoData, selectedState);
-    
-    // Actualizar información del estado
-    updateStateInfo(globalData, selectedState, selectedYear);
-    
-    // Actualizar gráfico de barras
-    updateBarChart(globalData, selectedState, selectedYear);
-    
-    // Actualizar gráficos circulares
-    updatePieCharts(globalData, selectedState, selectedYear, selectedCategory);
-    
-    // Actualizar el nuevo gráfico con estilo hecho a mano
-    createHandDrawnChart(globalData, selectedState, selectedYear);
+  } else {
+    d3.select("#map-container")
+      .html("")
+      .append("div")
+        .attr("class", "error-message")
+        .text("Error: no hay datos geográficos disponibles");
+  }
+
+  // Info de estado
+  updateStateInfo(globalData, selectedState, selectedYear);
+
+  // Bar chart
+  updateBarChart(globalData, selectedState, selectedYear);
+
+  // Pie charts
+  updatePieCharts(globalData, selectedState, selectedYear, selectedCategory);
+
+
 }
 
-/**
- * Actualiza la información del estado seleccionado
- */
+// Muestra nombre del estado, total de becas y top universidades
 function updateStateInfo(data, state, year) {
-    // Obtener elementos del DOM
-    const estadoNombre = document.getElementById("estado-nombre");
-    const totalBecas = document.getElementById("total-becas");
-    const listaUniversidades = document.getElementById("lista-universidades");
-    
-    // Limpiar contenido actual
-    listaUniversidades.innerHTML = "";
-    
-    // Si no hay estado seleccionado, mostrar mensaje
-    if (!state) {
-        estadoNombre.textContent = "Ninguno seleccionado";
-        totalBecas.textContent = "0";
-        return;
+  const nombreEl   = document.getElementById("estado-nombre");
+  const totalEl    = document.getElementById("total-becas");
+  const listEl     = document.getElementById("lista-universidades");
+  listEl.innerHTML = "";
+
+  if (!state) {
+    nombreEl.textContent = "Ninguno seleccionado";
+    totalEl.textContent  = "0";
+    return;
+  }
+
+  const option = document.querySelector(`#estado-selector option[value="${state}"]`);
+  nombreEl.textContent = option ? option.text : state;
+
+  const filtered = data.filter(
+    d => d.UF_BENEFICIARIO_BOLSA === state && d.ANO_CONCESSAO_BOLSA == year
+  );
+  totalEl.textContent = filtered.length;
+
+  if (filtered.length === 0) {
+    const li = document.createElement("li");
+    li.textContent = "No hay datos disponibles";
+    listEl.appendChild(li);
+    return;
+  }
+
+  // Contar becas por universidad
+  const counts = {};
+  filtered.forEach(d => {
+    counts[d.NOME_IES_BOLSA] = (counts[d.NOME_IES_BOLSA] || 0) + 1;
+  });
+  // Top 5
+  Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .forEach(([uni, cnt]) => {
+      const li = document.createElement("li");
+      li.textContent = `${uni}: ${cnt} becas`;
+      listEl.appendChild(li);
+    });
+}
+
+// Genera datos aleatorios si falla la carga real
+function createSampleData() {
+  const states = [
+    "AC","AL","AM","AP","BA","CE","DF","ES","GO","MA",
+    "MG","MS","MT","PA","PB","PE","PI","PR","RJ","RN",
+    "RO","RR","RS","SC","SE","SP","TO"
+  ];
+  const turnos      = ["Integral","Matutino","Vespertino","Noturno","A Distância"];
+  const tiposBeca   = ["Integral","Parcial"];
+  const generos     = ["F","M"];
+  const etnias      = ["BRANCA","PRETA","PARDA","AMARELA","INDÍGENA","NÃO INFORMADO"];
+  const universidades = [
+    "UF São Paulo","UnB","UFRJ","UFMG","Unicamp",
+    "PUC","UFBA","UFPE","UFRGS","UFSC"
+  ];
+  const sample = [];
+  states.forEach(uf => {
+    for (let y = 2015; y <= 2022; y++) {
+      const n = Math.floor(Math.random() * 150) + 50;
+      for (let i = 0; i < n; i++) {
+        sample.push({
+          UF_BENEFICIARIO_BOLSA: uf,
+          ANO_CONCESSAO_BOLSA: y,
+          NOME_TURNO_CURSO_BOLSA: turnos[Math.floor(Math.random() * turnos.length)],
+          TIPO_BOLSA: tiposBeca[Math.floor(Math.random() * tiposBeca.length)],
+          SEXO_BENEFICIARIO_BOLSA: generos[Math.floor(Math.random() * generos.length)],
+          RACA_BENEFICIARIO_BOLSA: etnias[Math.floor(Math.random() * etnias.length)],
+          NOME_IES_BOLSA: universidades[Math.floor(Math.random() * universidades.length)]
+        });
+      }
     }
-    
-    // Obtener nombre completo del estado
-    const nombreCompleto = document.querySelector(`#estado-selector option[value="${state}"]`).text;
-    estadoNombre.textContent = nombreCompleto;
-    
-    // Filtrar datos para el estado y año seleccionados
-    const filteredData = data.filter(d => 
-        d.UF_BENEFICIARIO_BOLSA === state && 
-        d.ANO_CONCESSAO_BOLSA == year
-    );
-    
-    // Actualizar total de becas
-    totalBecas.textContent = filteredData.length;
-    
-    // Contar becas por universidad
-    const universidadesCount = {};
-    filteredData.forEach(d => {
-        const universidad = d.NOME_IES_BOLSA;
-        if (universidadesCount[universidad]) {
-            universidadesCount[universidad]++;
-        } else {
-            universidadesCount[universidad] = 1;
-        }
+  });
+  console.log(`🤖 Datos de muestra generados: ${sample.length} registros`);
+  return sample;
+}
+
+// Agrega un botón flotante para depurar en runtime
+function addDebugButton() {
+  const btn = document.createElement("button");
+  btn.textContent = "Depurar Datos";
+  Object.assign(btn.style, {
+    position: "fixed", bottom: "10px", right: "10px",
+    padding: "6px 12px", background: "#fff", border: "1px solid #ccc",
+    cursor: "pointer", zIndex: 1000
+  });
+  btn.addEventListener("click", () => {
+    const filteredCount = globalData.filter(d =>
+      d.UF_BENEFICIARIO_BOLSA === selectedState &&
+      d.ANO_CONCESSAO_BOLSA == selectedYear
+    ).length;
+    console.log("🛠️ Debug:", {
+      geoDataExists: !!geoData,
+      totalRecords: globalData.length,
+      filteredCount,
+      selected: { selectedState, selectedYear, selectedCategory }
     });
-    
-    // Convertir a array y ordenar
-    const universidadesArray = Object.keys(universidadesCount).map(uni => {
-        return {
-            nombre: uni,
-            count: universidadesCount[uni]
-        };
-    });
-    
-    universidadesArray.sort((a, b) => b.count - a.count);
-    
-    // Mostrar top 5 universidades
-    const top5 = universidadesArray.slice(0, 5);
-    top5.forEach(uni => {
-        const li = document.createElement("li");
-        li.textContent = `${uni.nombre}: ${uni.count} becas`;
-        listaUniversidades.appendChild(li);
-    });
-    
-    // Si no hay universidades, mostrar mensaje
-    if (top5.length === 0) {
-        const li = document.createElement("li");
-        li.textContent = "No hay datos disponibles";
-        listaUniversidades.appendChild(li);
-    }
+    alert(`Debug info:\n• GeoData: ${geoData? "sí":"no"}\n• Total: ${globalData.length}\n• Filtrados: ${filteredCount}`);
+  });
+  document.body.appendChild(btn);
+}

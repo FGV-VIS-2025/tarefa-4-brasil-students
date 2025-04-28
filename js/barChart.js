@@ -171,9 +171,6 @@ function updateVisualizations() {
     console.log("Actualizando gráficos circulares...");
     updatePieCharts(globalData, selectedState, selectedYear, selectedCategory);
     
-    // Actualizar el nuevo gráfico con estilo hecho a mano
-    console.log("Actualizando gráfico con estilo hecho a mano...");
-    createHandDrawnChart(globalData, selectedState, selectedYear);
 }
 
 /**
