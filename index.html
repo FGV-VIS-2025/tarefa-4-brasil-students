@@ -1,39 +1,139 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mapa Interactivo Prouni</title>
-
-  <!-- Estilos -->
-  <link rel="stylesheet" href="CSS/style.css" />
-
-  <!-- D3.js -->
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BraVis Student Scholarship</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+    <div class="main-container">
+        <!-- Título principal -->
+        <h1>BraVis Student Scolarship</h1>
+        
+        <!-- Controles de selección -->
+        <div class="controls">
+            <div class="control-item">
+                <label for="estado-selector">Selecione um estado:</label>
+                <select id="estado-selector">
+                    <option value="">--</option>
+                    <option value="AC">Acre</option>
+                    <option value="AL">Alagoas</option>
+                    <option value="AM">Amazonas</option>
+                    <option value="AP">Amapá</option>
+                    <option value="BA">Bahia</option>
+                    <option value="CE">Ceará</option>
+                    <option value="DF">Distrito Federal</option>
+                    <option value="ES">Espírito Santo</option>
+                    <option value="GO">Goiás</option>
+                    <option value="MA">Maranhão</option>
+                    <option value="MG">Minas Gerais</option>
+                    <option value="MS">Mato Grosso do Sul</option>
+                    <option value="MT">Mato Grosso</option>
+                    <option value="PA">Pará</option>
+                    <option value="PB">Paraíba</option>
+                    <option value="PE">Pernambuco</option>
+                    <option value="PI">Piauí</option>
+                    <option value="PR">Paraná</option>
+                    <option value="RJ">Rio de Janeiro</option>
+                    <option value="RN">Rio Grande do Norte</option>
+                    <option value="RO">Rondônia</option>
+                    <option value="RR">Roraima</option>
+                    <option value="RS">Rio Grande do Sul</option>
+                    <option value="SC">Santa Catarina</option>
+                    <option value="SE">Sergipe</option>
+                    <option value="SP">São Paulo</option>
+                    <option value="TO">Tocantins</option>
+                </select>
+            </div>
+            
+            <div class="control-item">
+                <label for="year-selector">Selecione anho:</label>
+                <select id="year-selector">
+                    <option value="2015">2015</option>
+                    <option value="2016">2016</option>
+                    <option value="2017">2017</option>
+                    <option value="2018">2018</option>
+                    <option value="2019">2019</option>
+                    <option value="2020">2020</option>
+                    <option value="2021">2021</option>
+                    <option value="2022">2022</option>
+                </select>
+            </div>
+            
+            <div class="control-item">
+                <label for="category-selector">Selecciona una categoria:</label>
+                <select id="category-selector">
+                    <option value="NOME_TURNO_CURSO_BOLSA">NOME_TURNO_CURSO_BOLSA</option>
+                    <option value="TIPO_BOLSA">TIPO_BOLSA</option>
+                    <option value="SEXO_BENEFICIARIO_BOLSA">SEXO_BENEFICIARIO_BOLSA</option>
+                    <option value="RACA_BENEFICIARIO_BOLSA">RACA_BENEFICIARIO_BOLSA</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Tema -->
+        <div class="theme-selector">
+            <span>Theme: Light</span>
+        </div>
+        
+        <!-- Mapa de Brasil -->
+        <div id="map-container">
+            <!-- El mapa se renderizará aquí con D3.js -->
+        </div>
+        
+        <!-- Información del estado -->
+        <div class="state-info">
+            <h2 id="estado-title">Estado: <span id="estado-nombre"></span></h2>
+            <p>Total becas: <span id="total-becas">0</span></p>
+            <div id="top-universidades">
+                <h3>Top 5 universidades:</h3>
+                <ul id="lista-universidades">
+                    <!-- Las universidades se cargarán aquí -->
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Gráficos existentes -->
+        <div class="charts-row">
+            <!-- Gráfico de barras -->
+            <div id="bar-chart-container">
+                <h3>Porcentage estudantes por turno Estado <span id="estado-barchart"></span></h3>
+                <div id="bar-chart"></div>
+            </div>
+            
+            <!-- Gráficos circulares -->
+            <div id="pie-charts-container">
+                <h3>Resumen otras categorias</h3>
+                <div class="pie-charts">
+                    <div id="pie-chart1">
+                        <h4>Variable1</h4>
+                    </div>
+                    <div id="pie-chart2">
+                        <h4>Variable2</h4>
+                    </div>
+                    <div id="pie-chart3">
+                        <h4>Variable3</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- NUEVO: Gráfico con estilo hecho a mano -->
+        <div class="chart-container" id="hand-drawn-chart-container">
+            <h3>Análisis Comparativo de Estudiantes</h3>
+            <div id="hand-drawn-chart"></div>
+        </div>
+    </div>
 
-  <h1>Mapa Interactivo Prouni</h1>
-
-  <!-- Selector de estado -->
-  <div class="controls">
-    <label for="sel-uf">Selecciona un estado:</label>
-    <select id="sel-uf">
-      <option value="--">--</option>
-    </select>
-  </div>
-
-  <!-- Contenedor del mapa -->
-  <div id="mapa"></div>
-
-  <!-- Panel de información -->
-  <div id="info">
-    <h2 id="titulo-estado">—</h2>
-    <p id="stats">Aquí aparecerán las estadísticas.</p>
-  </div>
-
-  <!-- Tu script D3 -->
-  <script src="js/script.js"></script>
+    <!-- Scripts -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/d3-geo.v3.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/barChart.js"></script>
+    <script src="js/pieCharts.js"></script>
+    <script src="js/handDrawnChart.js"></script>
 </body>
 </html>

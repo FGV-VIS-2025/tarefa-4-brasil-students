@@ -1,68 +1,283 @@
-/* style.css */
-
 /* Estilos generales */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    background-color: #f9f9f9;
-    color: #333;
+  background-color: #f8f8f8;
+  color: #333;
+  line-height: 1.6;
+}
+
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 28px;
+}
+
+h3 {
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: #444;
+}
+
+/* Estilos para los controles */
+.controls {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  background-color: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.control-item {
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+}
+
+.control-item label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+select {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background-color: white;
+  font-size: 14px;
+}
+
+/* Estilos para el mapa */
+#map-container {
+  width: 100%;
+  height: 400px;
+  background-color: white;
+  margin-bottom: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+}
+
+.states {
+  fill: #e8e8e8;
+  stroke: #fff;
+  stroke-width: 1px;
+}
+
+.state-selected {
+  fill: orange;
+}
+
+/* Estilos para los gráficos existentes */
+.charts-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+#bar-chart-container, #pie-charts-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+}
+
+#bar-chart-container {
+  width: 58%;
+}
+
+#pie-charts-container {
+  width: 38%;
+}
+
+.pie-charts {
+  display: flex;
+  justify-content: space-between;
+  height: 250px;
+}
+
+#pie-chart1, #pie-chart2, #pie-chart3 {
+  width: 33%;
+  height: 100%;
+}
+
+/* Estilos para las barras */
+.bar {
+  fill: steelblue;
+  transition: all 0.3s ease;
+}
+
+.bar:hover {
+  fill: #3a7ab8;
+}
+
+/* Estilos para los ejes */
+.axis text {
+  font-size: 12px;
+}
+
+.axis line, .axis path {
+  stroke: #ccc;
+}
+
+/* Estilos para etiquetas */
+.chart-label {
+  font-size: 12px;
+  text-anchor: middle;
+}
+
+/* Información del estado */
+.state-info {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  margin-bottom: 30px;
+}
+
+.state-info h2 {
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 20px;
+}
+
+.state-info ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.state-info li {
+  margin-bottom: 5px;
+}
+
+/* NUEVO: Estilos para el gráfico hecho a mano */
+#hand-drawn-chart-container {
+  margin-top: 30px;
+  width: 100%;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border: 1px solid #ddd;
+}
+
+#hand-drawn-chart-container h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 20px;
+  text-align: center;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+#hand-drawn-chart {
+  width: 100%;
+  height: 400px;
+  background-color: #ffffff;
+  border-radius: 4px;
+  padding: 5px;
+}
+
+.hand-drawn-bar {
+  transition: all 0.3s ease;
+}
+
+.hand-drawn-bar:hover {
+  filter: brightness(1.1);
+  transform: scale(1.01);
+  cursor: pointer;
+}
+
+#hand-drawn-chart text {
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+#hand-drawn-chart .value-label {
+  font-size: 12px;
+  font-weight: bold;
+  fill: #333;
+}
+
+.tooltip {
+  position: absolute;
+  text-align: center;
+  padding: 10px;
+  font: 12px sans-serif;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transition: opacity 0.2s;
+}
+
+/* Estilos para pantallas más pequeñas */
+@media (max-width: 992px) {
+  .charts-row {
+    flex-direction: column;
   }
   
-  /* Contenedor del mapa */
-  #mapa {
-    width: 800px;
-    height: 600px;
-    border: 1px solid #ccc;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin-top: 1rem;
+  #bar-chart-container, #pie-charts-container {
+    width: 100%;
+    margin-bottom: 20px;
   }
   
-  /* Opciones del select */
-  label, select {
-    font-size: 1rem;
-    margin-right: 0.5rem;
-  }
-  select {
-    padding: 0.4rem 0.6rem;
+  .controls {
+    flex-direction: column;
   }
   
-  /* Estilos de los estados en el SVG */
-  .estado {
-    fill: #ddd;
-    stroke: #fff;
-    stroke-width: 0.5px;
-    transition: fill 0.2s ease;
-  }
-  .estado:hover {
-    fill: #bbb;
-    cursor: pointer;
-  }
-  /* Estado seleccionado */
-  .seleccionado {
-    fill: orange !important;
+  .control-item {
+    width: 100%;
+    margin-bottom: 15px;
   }
   
-  /* Panel de información */
-  #info {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  #hand-drawn-chart {
+    height: 350px;
   }
-  #info h2 {
-    margin: 0 0 0.5rem;
-    font-size: 1.25rem;
-  }
-  #stats {
-    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  #map-container {
+    height: 300px;
   }
   
-  /* Responsividad básica */
-  @media (max-width: 900px) {
-    #mapa {
-      width: 100%;
-      height: auto;
-    }
+  .pie-charts {
+    flex-direction: column;
+    height: auto;
   }
   
+  #pie-chart1, #pie-chart2, #pie-chart3 {
+    width: 100%;
+    height: 150px;
+    margin-bottom: 20px;
+  }
+  
+  #hand-drawn-chart {
+    height: 300px;
+  }
+  
+  h1 {
+    font-size: 24px;
+  }
+  
+  h3 {
+    font-size: 16px;
+  }
+}
