@@ -26,7 +26,7 @@
     <!-- Controles de selección -->
     <div class="controls">
       <div class="control-item">
-        <label for="estado-selector">Seleccione un estado:</label>
+        <label for="estado-selector">Selecione um estado:</label>
         <select id="estado-selector">
           <option value="">--</option>
           <option value="AC">Acre</option>
@@ -60,7 +60,7 @@
       </div>
 
       <div class="control-item">
-        <label for="year-selector">Seleccione año:</label>
+        <label for="year-selector">Selecione ano:</label>
         <select id="year-selector">
           <option value="2014">2014</option>
           <option value="2015">2015</option>
@@ -72,11 +72,11 @@
       </div>
 
       <div class="control-item">
-        <label for="category-selector">Seleccione categoría:</label>
+        <label for="category-selector">Selecione categoria:</label>
         <select id="category-selector">
           <option value="NOME_TURNO_CURSO_BOLSA">Turno</option>
-          <option value="TIPO_BOLSA">Tipo de Beca</option>
-          <option value="SEXO_BENEFICIARIO_BOLSA">Género</option>
+          <option value="TIPO_BOLSA">Tipo de Bolsa</option>
+          <option value="SEXO_BENEFICIARIO_BOLSA">Gênero</option>
           <option value="RACA_BENEFICIARIO_BOLSA">Etnia</option>
         </select>
       </div>
@@ -84,24 +84,24 @@
 
     <!-- Estado de carga -->
     <div id="loading-status" style="display: none; text-align: center; padding: 10px; margin: 15px 0; background-color: #f0f0f0; border-radius: 4px;">
-      <span>Cargando datos...</span>
+      <span>Carregando datos...</span>
     </div>
 
     <!-- 1) Mapa de Brasil -->
     <div id="map-container" style="width: 100%; height: 400px; position: relative;">
       <div class="map-loading" style="text-align: center; padding: 150px 0;">
-        <p>Cargando mapa de Brasil...</p>
+        <p>Carregando mapa do Brasil...</p>
       </div>
     </div>
 
     <!-- 2) Información del estado -->
     <div class="state-info">
-      <h2>Estado: <span id="estado-nombre">Ninguno seleccionado</span></h2>
-      <p>Total becas: <span id="total-becas">0</span></p>
+      <h2>Estado: <span id="estado-nombre">Nenhum selecionado</span></h2>
+      <p>Total bolsas: <span id="total-becas">0</span></p>
       <div id="top-universidades">
         <h3>Top 5 universidades:</h3>
         <ul id="lista-universidades">
-          <li>Seleccione un estado para ver información</li>
+          <li>Selecione um estado para ver informação</li>
         </ul>
       </div>
     </div>
@@ -110,20 +110,20 @@
     <div class="charts-row">
       <!-- 3.1) Bar chart -->
       <div id="bar-chart-container">
-        <h3>Porcentaje estudiantes por turno (Estado <span id="estado-barchart">Ninguno seleccionado</span>)</h3>
+        <h3>Porcentagem de estudantes por turno (Estado <span id="estado-barchart">Nenhum selecionado</span>)</h3>
         <div id="bar-chart" style="width: 100%; height: 300px;">
           <div class="chart-placeholder" style="text-align:center; padding:100px 0;">
-            Seleccione un estado para visualizar datos
+            Selecione um estado para visualizar dados
           </div>
         </div>
       </div>
 
       <!-- 3.2) Pie charts -->
       <div id="pie-charts-container">
-        <h3>Resumen otras categorías</h3>
+        <h3>Resumo outras categorias</h3>
         <div class="pie-charts">
-          <div id="pie-chart1"><h4>Tipo de Beca</h4></div>
-          <div id="pie-chart2"><h4>Género</h4></div>
+          <div id="pie-chart1"><h4>Tipo de Bolsa</h4></div>
+          <div id="pie-chart2"><h4>Gênero</h4></div>
           <div id="pie-chart3"><h4>Etnia</h4></div>
         </div>
       </div>
@@ -131,10 +131,10 @@
 
     <!-- 4) Hand-drawn style chart -->
     <div id="hand-drawn-chart-container">
-      <h3>Análisis Comparativo de Estudiantes</h3>
+      <h3>Análise Comparativa de Estudantes</h3>
       <div id="hand-drawn-chart" style="width:100%; height:300px;">
         <div class="chart-placeholder" style="text-align:center; padding:150px 0;">
-          Seleccione un estado para visualizar datos
+          Selecione um estado para visualizar dados
         </div>
       </div>
     </div>
