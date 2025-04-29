@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .finally(() => {
       setupControls();
       updateVisualizations();
-      addDebugButton();
+
     });
 });
 
