@@ -1,31 +1,31 @@
 // js/main.js
 
 /**
- * Script principal para BraVis Student Scholarship
+ * Script principal de BraVis Student Scholarship
  */
 
-let globalData = [];    // datos CSV
-let geoData = null;     // geojson
-let ufKey = null;       // nombre de la columna UF detectada
-let anoKey = null;      // nombre de la columna Año detectada
+let globalData = [];   // datos del CSV
+let geoData    = null; // geoJSON de Brasil
 
-// controles actuales
-let selectedState = "";
-let selectedYear = "";
+// Claves dinámicas de columna (detectadas tras cargar CSV)
+let ufKey = null;
+let anoKey = null;
+
+// Estado de los select
+let selectedState    = "";
+let selectedYear     = "";
 let selectedCategory = "";
 
-/**
- * Inicia la carga de datos y la app cuando el DOM esté listo
- */
+// Arranca cuando el DOM esté listo
 document.addEventListener("DOMContentLoaded", () => {
   console.log("▶ Iniciando aplicación...");
 
-  // 1) Cargar geodatos
+  // 1) Cargar geoJSON
   d3.json("data/brazil-states.geojson")
     .then(geo => {
       geoData = geo;
       console.log("✅ Geodatos cargados");
-      // 2) Cargar CSV
+      // 2) Cargar CSV con datos de estudiantes
       return d3.csv("data/data.csv");
     })
     .then(data => {
@@ -33,48 +33,46 @@ document.addEventListener("DOMContentLoaded", () => {
         throw new Error("CSV vacío o no encontrado");
       }
 
-      // 3) Diagnóstico de columnas
-      console.log("Primer registro CSV:", data[0]);
-      const keys = Object.keys(data[0]);
-      ufKey  = keys.find(k => k.toLowerCase().includes("uf"));
-      anoKey = keys.find(k => k.toLowerCase().includes("ano"));
-      console.log(`Usando columna UF: '${ufKey}', columna Año: '${anoKey}'`);
+      globalData = data;
+      console.log("Primer registro CSV:", globalData[0]);
+      console.log("Campos disponibles:", Object.keys(globalData[0]).join(", "));
 
-      // 4) Parsear año a número
-      data.forEach(d => {
+      // Detectar columnas de UF y de Año
+      ufKey  = Object.keys(globalData[0]).find(k => k.toLowerCase().includes("uf"));
+      anoKey = Object.keys(globalData[0]).find(k => k.toLowerCase().includes("ano"));
+      console.log(`→ ufKey='${ufKey}', anoKey='${anoKey}'`);
+
+      // Convertir año a número
+      globalData.forEach(d => {
         d[anoKey] = +d[anoKey];
       });
-
-      globalData = data;
-      console.log(`✅ ${globalData.length} registros cargados`);
-
     })
     .catch(err => {
       console.error("❌ Error cargando datos:", err);
-      // Si quieres datos de muestra, podrías llamar aquí a createSampleData()
+      // Opcional: podrías asignar datos de muestra aquí
       globalData = [];
     })
     .finally(() => {
       setupControls();
       updateVisualizations();
-
+      addDebugButton();
     });
 });
 
 /**
- * Configura los select de estado, año y categoría
+ * Configura los <select> de estado, año y categoría, con sus listeners
  */
 function setupControls() {
   const estadoSel    = document.getElementById("estado-selector");
   const yearSel      = document.getElementById("year-selector");
   const categorySel  = document.getElementById("category-selector");
 
-  // valores iniciales
+  // Valores iniciales
   selectedState    = estadoSel.value;
   selectedYear     = yearSel.value;
   selectedCategory = categorySel.value;
 
-  // listeners
+  // Listeners
   estadoSel.addEventListener("change", () => {
     selectedState = estadoSel.value;
     updateVisualizations();
@@ -95,35 +93,36 @@ function setupControls() {
 function updateVisualizations() {
   console.log("🔄 updateVisualizations", { selectedState, selectedYear, selectedCategory });
 
-  // 1) Mapa
+  // 1) Mapa de Brasil
   if (geoData) {
     updateMap(geoData, selectedState);
   }
 
-  // 2) Información del estado (nombre, total becas, top universidades)
+  // 2) Info del estado: nombre, total becas, top universidades
   updateStateInfo();
 
   // 3) Actualizar título del bar chart
-  const spanTitle = document.getElementById("estado-barchart");
+  const bTitle = document.getElementById("estado-barchart");
   if (selectedState) {
     const opt = document.querySelector(`#estado-selector option[value="${selectedState}"]`);
-    spanTitle.textContent = opt ? opt.text : selectedState;
+    bTitle.textContent = opt ? opt.text : selectedState;
   } else {
-    spanTitle.textContent = "Ninguno seleccionado";
+    bTitle.textContent = "Ninguno seleccionado";
   }
 
-  // 4) Bar Chart
+  // 4) Gráfico de barras
   updateBarChart(globalData, selectedState, selectedYear);
 
-  // 5) Pie Charts
+  // 5) Pie charts
   updatePieCharts(globalData, selectedState, selectedYear, selectedCategory);
 
-  // (No llamamos a handDrawnChart porque ya lo eliminaste)
+  // 6) Chart comparativo (“hand drawn”)
+  createHandDrawnChart(globalData, selectedState, selectedYear);
 }
 
 /**
- * Actualiza el bloque de Información del Estado
- * - Nombre del estado
+ * Rellena el bloque de Información del Estado:
+ * - Nombre legible del estado
  * - Total de becas
  * - Top 5 universidades
  */
@@ -141,10 +140,10 @@ function updateStateInfo() {
   }
 
   // Nombre legible
-  const option = document.querySelector(`#estado-selector option[value="${selectedState}"]`);
-  nombreEl.textContent = option ? option.text : selectedState;
+  const opt = document.querySelector(`#estado-selector option[value="${selectedState}"]`);
+  nombreEl.textContent = opt ? opt.text : selectedState;
 
-  // Filtrar datos usando las columnas detectadas
+  // Filtrar por estado y año
   const filtered = globalData.filter(d =>
     d[ufKey] === selectedState &&
     d[anoKey] === +selectedYear
@@ -157,14 +156,14 @@ function updateStateInfo() {
     return;
   }
 
-  // Contar por universidad
+  // Contar becas por universidad
   const counts = {};
   filtered.forEach(d => {
     const uni = d.NOME_IES_BOLSA;
     counts[uni] = (counts[uni] || 0) + 1;
   });
 
-  // Top 5
+  // Top 5 y añadir al DOM
   Object.entries(counts)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
@@ -176,11 +175,11 @@ function updateStateInfo() {
 }
 
 /**
- * Agrega un botón de depuración para inspeccionar estado interno en runtime
+ * Añade un botón flotante de debug para inspeccionar el estado interno
  */
 function addDebugButton() {
   const btn = document.createElement("button");
-  btn.textContent = "🛠 Debug";
+  btn.textContent = "🛠️ Debug";
   Object.assign(btn.style, {
     position: "fixed",
     bottom: "12px",
@@ -191,14 +190,22 @@ function addDebugButton() {
     cursor: "pointer",
     zIndex: 1000
   });
-  btn.addEventListener("click", () => {
+  btn.onclick = () => {
+    console.log({
+      geoDataExists: !!geoData,
+      totalRecords: globalData.length,
+      selectedState,
+      selectedYear,
+      ufKey,
+      anoKey
+    });
     alert(`Debug info:
-• geoData cargado: ${!!geoData}
-• Registros totales: ${globalData.length}
-• Estado seleccionado: ${selectedState}
-• Año seleccionado: ${selectedYear}
-• Columnas detectadas: UF='${ufKey}', Año='${anoKey}'`);
-    console.log({ globalData, selectedState, selectedYear, ufKey, anoKey });
-  });
+• geoData: ${!!geoData}
+• Registros: ${globalData.length}
+• Estado: ${selectedState}
+• Año: ${selectedYear}
+• ufKey: ${ufKey}
+• anoKey: ${anoKey}`);
+  };
   document.body.appendChild(btn);
 }
