@@ -12,7 +12,7 @@
  * @param {string} selectedState  – Código UF del estado seleccionado (ej. "MT")
  */
 function updateMap(geoData, selectedState) {
-    console.log("Actualizando mapa, estado:", selectedState);
+    console.log("Atualizando mapa, estado:", selectedState);
   
     const container = d3.select("#map-container");
     // 1) Limpiar contenido previo
@@ -27,7 +27,7 @@ function updateMap(geoData, selectedState) {
         .style("color", "red")
         .style("text-align", "center")
         .style("padding", "20px")
-        .text("Error: no se pudieron cargar los datos geográficos del mapa.");
+        .text("Error: não foi possível carregar os dados geográficos do mapa.");
       return;
     }
   
@@ -141,6 +141,6 @@ function updateMap(geoData, selectedState) {
       });
     svg.call(zoom);
   
-    console.log("Mapa renderizado correctamente");
+    console.log("Mapa renderizado corretamente");
   }
   

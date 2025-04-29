@@ -18,24 +18,24 @@ let selectedCategory = "";
 
 // Arranca cuando el DOM esté listo
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("▶ Iniciando aplicación...");
+  console.log("▶ Iniciando aplicativo...");
 
   // 1) Cargar geoJSON
   d3.json("data/brazil-states.geojson")
     .then(geo => {
       geoData = geo;
-      console.log("✅ Geodatos cargados");
+      console.log("✅ Geodatos carregados");
       // 2) Cargar CSV con datos de estudiantes
       return d3.csv("data/data.csv");
     })
     .then(data => {
       if (!data || data.length === 0) {
-        throw new Error("CSV vacío o no encontrado");
+        throw new Error("CSV vazio ou não encontrado");
       }
 
       globalData = data;
-      console.log("Primer registro CSV:", globalData[0]);
-      console.log("Campos disponibles:", Object.keys(globalData[0]).join(", "));
+      console.log("Primeiro registro CSV:", globalData[0]);
+      console.log("Campos disponíveis:", Object.keys(globalData[0]).join(", "));
 
       // Detectar columnas de UF y de Año
       ufKey  = Object.keys(globalData[0]).find(k => k.toLowerCase().includes("uf"));
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     })
     .catch(err => {
-      console.error("❌ Error cargando datos:", err);
+      console.error("❌ Error carregando dados:", err);
       // Opcional: podrías asignar datos de muestra aquí
       globalData = [];
     })
@@ -107,7 +107,7 @@ function updateVisualizations() {
     const opt = document.querySelector(`#estado-selector option[value="${selectedState}"]`);
     bTitle.textContent = opt ? opt.text : selectedState;
   } else {
-    bTitle.textContent = "Ninguno seleccionado";
+    bTitle.textContent = "Nenhum selecionado";
   }
 
   // 4) Gráfico de barras
@@ -133,9 +133,9 @@ function updateStateInfo() {
   listEl.innerHTML = "";
 
   if (!selectedState) {
-    nombreEl.textContent = "Ninguno seleccionado";
+    nombreEl.textContent = "Nenhum selecionado";
     totalEl.textContent  = "0";
-    listEl.innerHTML     = `<li>Seleccione un estado para ver información</li>`;
+    listEl.innerHTML     = `<li>Selecione um estado para ver informação</li>`;
     return;
   }
 
@@ -152,7 +152,7 @@ function updateStateInfo() {
   totalEl.textContent = filtered.length;
 
   if (filtered.length === 0) {
-    listEl.innerHTML = `<li>No hay datos disponibles</li>`;
+    listEl.innerHTML = `<li>Não há dados disponíveis</li>`;
     return;
   }
 

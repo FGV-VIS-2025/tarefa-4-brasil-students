@@ -13,7 +13,7 @@
  * @param {String} selectedCategory - Categoría seleccionada
  */
 function updatePieCharts(data, selectedState, selectedYear, selectedCategory) {
-    console.log("Actualizando gráficos circulares para:", selectedState, selectedYear, selectedCategory);
+    console.log("Atualizando gráficos circulares para:", selectedState, selectedYear, selectedCategory);
     
     // Limpiar gráficos existentes
     d3.select("#pie-chart1").html("");
@@ -22,18 +22,18 @@ function updatePieCharts(data, selectedState, selectedYear, selectedCategory) {
     
     // Si no hay estado seleccionado, mostrar mensaje
     if (!selectedState) {
-        showNoDataMessage("#pie-chart1", "Seleccione un estado");
-        showNoDataMessage("#pie-chart2", "Seleccione un estado");
-        showNoDataMessage("#pie-chart3", "Seleccione un estado");
+        showNoDataMessage("#pie-chart1", "Selecione um estado");
+        showNoDataMessage("#pie-chart2", "Selecione um estado");
+        showNoDataMessage("#pie-chart3", "Selecione um estado");
         return;
     }
     
     // Verificar que los datos existan
     if (!data || !Array.isArray(data) || data.length === 0) {
-        console.warn("No hay datos disponibles para los gráficos circulares");
-        showNoDataMessage("#pie-chart1", "No hay datos disponibles");
-        showNoDataMessage("#pie-chart2", "No hay datos disponibles");
-        showNoDataMessage("#pie-chart3", "No hay datos disponibles");
+        console.warn("Não há dados disponíveis para os gráficos circulares");
+        showNoDataMessage("#pie-chart1", "Não há dados disponíveis");
+        showNoDataMessage("#pie-chart2", "Não há dados disponíveis");
+        showNoDataMessage("#pie-chart3", "Não há dados disponíveis");
         return;
     }
     
@@ -43,32 +43,32 @@ function updatePieCharts(data, selectedState, selectedYear, selectedCategory) {
         d.ANO_CONCESSAO_BOLSA == selectedYear
     );
     
-    console.log("Datos filtrados para gráficos circulares:", filteredData.length);
+    console.log("Dados filtrados para gráficos circulares:", filteredData.length);
     
     // Si no hay datos filtrados, mostrar datos de muestra
     if (filteredData.length === 0) {
-        console.log("No hay datos filtrados, usando datos de muestra");
+        console.log("Não há dados filtrados, usando dados de amostra");
         
         // Crear datos de muestra para cada categoría
         const sampleData = createSamplePieData(selectedState, selectedYear);
         
         // Crear gráficos con datos de muestra
-        createPieChart("#pie-chart1", sampleData, "TIPO_BOLSA", "Tipo de Beca", true);
-        createPieChart("#pie-chart2", sampleData, "SEXO_BENEFICIARIO_BOLSA", "Género", true);
+        createPieChart("#pie-chart1", sampleData, "TIPO_BOLSA", "Tipo de Bolsa", true);
+        createPieChart("#pie-chart2", sampleData, "SEXO_BENEFICIARIO_BOLSA", "Gênero", true);
         createPieChart("#pie-chart3", sampleData, "RACA_BENEFICIARIO_BOLSA", "Etnia", true);
         return;
     }
     
     // Crear gráficos con datos reales
     try {
-        createPieChart("#pie-chart1", filteredData, "TIPO_BOLSA", "Tipo de Beca", false);
-        createPieChart("#pie-chart2", filteredData, "SEXO_BENEFICIARIO_BOLSA", "Género", false);
+        createPieChart("#pie-chart1", filteredData, "TIPO_BOLSA", "Tipo de Bolsa", false);
+        createPieChart("#pie-chart2", filteredData, "SEXO_BENEFICIARIO_BOLSA", "Gênero", false);
         createPieChart("#pie-chart3", filteredData, "RACA_BENEFICIARIO_BOLSA", "Etnia", false);
     } catch (error) {
-        console.error("Error al crear gráficos circulares:", error);
-        showNoDataMessage("#pie-chart1", "Error al crear gráfico: " + error.message);
-        showNoDataMessage("#pie-chart2", "Error al crear gráfico: " + error.message);
-        showNoDataMessage("#pie-chart3", "Error al crear gráfico: " + error.message);
+        console.error("Erro ao criar gráficos circulares:", error);
+        showNoDataMessage("#pie-chart1", "Erro ao criar gráfico: " + error.message);
+        showNoDataMessage("#pie-chart2", "Erro ao criar gráfico: " + error.message);
+        showNoDataMessage("#pie-chart3", "Erro ao criar gráfico: " + error.message);
     }
 }
 
@@ -77,7 +77,7 @@ function updatePieCharts(data, selectedState, selectedYear, selectedCategory) {
  * @param {String} containerId - ID del contenedor
  * @param {String} message - Mensaje a mostrar
  */
-function showNoDataMessage(containerId, message = "No hay datos disponibles") {
+function showNoDataMessage(containerId, message = "Não há dados disponíveis") {
     d3.select(containerId)
         .append("div")
         .attr("class", "no-data-message")
@@ -157,7 +157,7 @@ function createPieChart(containerId, data, categoryField, title, isSampleData = 
     // Procesar datos para el gráfico
     const categoryCounts = {};
     data.forEach(d => {
-        const category = d[categoryField] || "No especificado";
+        const category = d[categoryField] || "Não especificado";
         if (categoryCounts[category]) {
             categoryCounts[category]++;
         } else {
@@ -191,7 +191,7 @@ function createPieChart(containerId, data, categoryField, title, isSampleData = 
     
     // Si no hay datos procesados, mostrar mensaje
     if (processedData.length === 0) {
-        showNoDataMessage(containerId, "No hay datos para esta categoría");
+        showNoDataMessage(containerId, "Não há dados para esta categoria");
         return;
     }
     

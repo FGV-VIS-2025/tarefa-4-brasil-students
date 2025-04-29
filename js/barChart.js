@@ -18,7 +18,7 @@ function updateBarChart(data, state, year) {
         .attr("class", "chart-placeholder")
         .style("text-align", "center")
         .style("padding", "100px 0")
-        .text("Seleccione un estado para visualizar datos");
+        .text("Selecione um estado para visualizar dados");
       return;
     }
   
@@ -35,7 +35,7 @@ function updateBarChart(data, state, year) {
         .attr("class", "chart-placeholder")
         .style("text-align", "center")
         .style("padding", "100px 0")
-        .text(`No hay datos disponibles para ${state} en ${year}`);
+        .text(`Não há dados disponíveis para ${state} em ${year}`);
       return;
     }
   

@@ -18,7 +18,7 @@ function updateComparativeChart(data, state) {
         .attr("class", "chart-placeholder")
         .style("text-align", "center")
         .style("padding", "150px 0")
-        .text("Seleccione un estado para visualizar datos");
+        .text("Selecione um estado para visualizar dados");
       return;
     }
   
@@ -30,7 +30,7 @@ function updateComparativeChart(data, state) {
         .attr("class", "chart-placeholder")
         .style("text-align", "center")
         .style("padding", "150px 0")
-        .text(`No hay datos para ${state}`);
+        .text(`Não há dados para ${state}`);
       return;
     }
   
