@@ -1,1 +1,5 @@
 # tarefa-4-brasil-students
+
+**Justificativa para Decisões de Design:** Através da análise inicial do dataset (csv), optou-se por um dataset geojson como complemento, isto para utilizar uma visualização interativa do mapa com cada estado do Brasil. Por outro lado, aproveitou-se as variáveis para gerar gráficos de barras, de pizza e de linhas. Posteriormente, foram feitos dois esboços para ter uma ideia clara do panorama da visualização.
+
+**Processo de Desenvolvimento:** Por sermos dois integrantes, diversas reuniões foram realizadas, tendo como atividades: seleção do dataset, realização do esboço de visualização, design do projeto no Visual Studio Code (fase que toma mais tempo), e testes do "demo". O tempo total dedicado ao avanço do projeto (em grupo de duas pessoas) foi de aproximadamente 24 horas.
