@@ -1,57 +1,58 @@
 // js/main.js
 
 /**
- * main.js
- * Script principal para la aplicación BraVis Student Scholarship
- * Este archivo maneja la carga de datos y la coordinación entre visualizaciones
+ * Script principal para BraVis Student Scholarship
  */
 
-// Variables globales
-let globalData = [];           // Datos de estudiantes
-let geoData = null;            // GeoJSON de Brasil
-let selectedState = "";        // Estado seleccionado
-let selectedYear = "2015";     // Año seleccionado por defecto
-let selectedCategory = "NOME_TURNO_CURSO_BOLSA"; // Categoría por defecto
+let globalData = [];    // datos CSV
+let geoData = null;     // geojson
+let ufKey = null;       // nombre de la columna UF detectada
+let anoKey = null;      // nombre de la columna Año detectada
 
-// Inicialización cuando el DOM esté listo
+// controles actuales
+let selectedState = "";
+let selectedYear = "";
+let selectedCategory = "";
+
+/**
+ * Inicia la carga de datos y la app cuando el DOM esté listo
+ */
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("▶ Aplicación inicializada");
+  console.log("▶ Iniciando aplicación...");
 
-  // 1) Cargar GeoJSON de Brasil
+  // 1) Cargar geodatos
   d3.json("data/brazil-states.geojson")
     .then(geo => {
       geoData = geo;
       console.log("✅ Geodatos cargados");
+      // 2) Cargar CSV
       return d3.csv("data/data.csv");
     })
-    // 2) Cargar CSV de estudiantes
     .then(data => {
-      if (data && data.length > 0) {
-        console.log(`✅ ${data.length} registros de estudiantes cargados`);
-        // Convertir campos numéricos
-        data.forEach(d => {
-          d.ANO_CONCESSAO_BOLSA = +d.ANO_CONCESSAO_BOLSA;
-        });
-        globalData = data;
-      } else {
-        console.warn("⚠ CSV vacío: usando datos de muestra");
-        globalData = createSampleData();
+      if (!data || data.length === 0) {
+        throw new Error("CSV vacío o no encontrado");
       }
+
+      // 3) Diagnóstico de columnas
+      console.log("Primer registro CSV:", data[0]);
+      const keys = Object.keys(data[0]);
+      ufKey  = keys.find(k => k.toLowerCase().includes("uf"));
+      anoKey = keys.find(k => k.toLowerCase().includes("ano"));
+      console.log(`Usando columna UF: '${ufKey}', columna Año: '${anoKey}'`);
+
+      // 4) Parsear año a número
+      data.forEach(d => {
+        d[anoKey] = +d[anoKey];
+      });
+
+      globalData = data;
+      console.log(`✅ ${globalData.length} registros cargados`);
+
     })
     .catch(err => {
       console.error("❌ Error cargando datos:", err);
-      console.log("▶ Cargando datos de muestra y Geo alternativo...");
-      globalData = createSampleData();
-      // Geo alternativo remoto
-      return d3.json(
-        "https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson"
-      )
-      .then(geo => {
-        geoData = geo;
-      })
-      .catch(() => {
-        console.warn("⚠ No se pudo cargar Geo alternativo");
-      });
+      // Si quieres datos de muestra, podrías llamar aquí a createSampleData()
+      globalData = [];
     })
     .finally(() => {
       setupControls();
@@ -60,12 +61,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// Configura los selects y sus listeners
+/**
+ * Configura los select de estado, año y categoría
+ */
 function setupControls() {
-  const estadoSel   = document.getElementById("estado-selector");
-  const yearSel     = document.getElementById("year-selector");
-  const categorySel = document.getElementById("category-selector");
+  const estadoSel    = document.getElementById("estado-selector");
+  const yearSel      = document.getElementById("year-selector");
+  const categorySel  = document.getElementById("category-selector");
 
+  // valores iniciales
+  selectedState    = estadoSel.value;
+  selectedYear     = yearSel.value;
+  selectedCategory = categorySel.value;
+
+  // listeners
   estadoSel.addEventListener("change", () => {
     selectedState = estadoSel.value;
     updateVisualizations();
@@ -78,74 +87,83 @@ function setupControls() {
     selectedCategory = categorySel.value;
     updateVisualizations();
   });
-
-  // Valores iniciales
-  selectedState    = estadoSel.value;
-  selectedYear     = yearSel.value;
-  selectedCategory = categorySel.value;
-  console.log("Valores iniciales:", { selectedState, selectedYear, selectedCategory });
 }
 
-// Llama a todas las actualizaciones de visualizaciones
+/**
+ * Orquesta la actualización de todas las visualizaciones
+ */
 function updateVisualizations() {
   console.log("🔄 updateVisualizations", { selectedState, selectedYear, selectedCategory });
 
-  // Mapa
+  // 1) Mapa
   if (geoData) {
     updateMap(geoData, selectedState);
-  } else {
-    d3.select("#map-container")
-      .html("")
-      .append("div")
-        .attr("class", "error-message")
-        .text("Error: no hay datos geográficos disponibles");
   }
 
-  // Info de estado
-  updateStateInfo(globalData, selectedState, selectedYear);
+  // 2) Información del estado (nombre, total becas, top universidades)
+  updateStateInfo();
 
-  // Bar chart
+  // 3) Actualizar título del bar chart
+  const spanTitle = document.getElementById("estado-barchart");
+  if (selectedState) {
+    const opt = document.querySelector(`#estado-selector option[value="${selectedState}"]`);
+    spanTitle.textContent = opt ? opt.text : selectedState;
+  } else {
+    spanTitle.textContent = "Ninguno seleccionado";
+  }
+
+  // 4) Bar Chart
   updateBarChart(globalData, selectedState, selectedYear);
 
-  // Pie charts
+  // 5) Pie Charts
   updatePieCharts(globalData, selectedState, selectedYear, selectedCategory);
 
-
+  // (No llamamos a handDrawnChart porque ya lo eliminaste)
 }
 
-// Muestra nombre del estado, total de becas y top universidades
-function updateStateInfo(data, state, year) {
-  const nombreEl   = document.getElementById("estado-nombre");
-  const totalEl    = document.getElementById("total-becas");
-  const listEl     = document.getElementById("lista-universidades");
+/**
+ * Actualiza el bloque de Información del Estado
+ * - Nombre del estado
+ * - Total de becas
+ * - Top 5 universidades
+ */
+function updateStateInfo() {
+  const nombreEl = document.getElementById("estado-nombre");
+  const totalEl  = document.getElementById("total-becas");
+  const listEl   = document.getElementById("lista-universidades");
   listEl.innerHTML = "";
 
-  if (!state) {
+  if (!selectedState) {
     nombreEl.textContent = "Ninguno seleccionado";
     totalEl.textContent  = "0";
+    listEl.innerHTML     = `<li>Seleccione un estado para ver información</li>`;
     return;
   }
 
-  const option = document.querySelector(`#estado-selector option[value="${state}"]`);
-  nombreEl.textContent = option ? option.text : state;
+  // Nombre legible
+  const option = document.querySelector(`#estado-selector option[value="${selectedState}"]`);
+  nombreEl.textContent = option ? option.text : selectedState;
 
-  const filtered = data.filter(
-    d => d.UF_BENEFICIARIO_BOLSA === state && d.ANO_CONCESSAO_BOLSA == year
+  // Filtrar datos usando las columnas detectadas
+  const filtered = globalData.filter(d =>
+    d[ufKey] === selectedState &&
+    d[anoKey] === +selectedYear
   );
+
   totalEl.textContent = filtered.length;
 
   if (filtered.length === 0) {
-    const li = document.createElement("li");
-    li.textContent = "No hay datos disponibles";
-    listEl.appendChild(li);
+    listEl.innerHTML = `<li>No hay datos disponibles</li>`;
     return;
   }
 
-  // Contar becas por universidad
+  // Contar por universidad
   const counts = {};
   filtered.forEach(d => {
-    counts[d.NOME_IES_BOLSA] = (counts[d.NOME_IES_BOLSA] || 0) + 1;
+    const uni = d.NOME_IES_BOLSA;
+    counts[uni] = (counts[uni] || 0) + 1;
   });
+
   // Top 5
   Object.entries(counts)
     .sort((a, b) => b[1] - a[1])
@@ -157,63 +175,30 @@ function updateStateInfo(data, state, year) {
     });
 }
 
-// Genera datos aleatorios si falla la carga real
-function createSampleData() {
-  const states = [
-    "AC","AL","AM","AP","BA","CE","DF","ES","GO","MA",
-    "MG","MS","MT","PA","PB","PE","PI","PR","RJ","RN",
-    "RO","RR","RS","SC","SE","SP","TO"
-  ];
-  const turnos      = ["Integral","Matutino","Vespertino","Noturno","A Distância"];
-  const tiposBeca   = ["Integral","Parcial"];
-  const generos     = ["F","M"];
-  const etnias      = ["BRANCA","PRETA","PARDA","AMARELA","INDÍGENA","NÃO INFORMADO"];
-  const universidades = [
-    "UF São Paulo","UnB","UFRJ","UFMG","Unicamp",
-    "PUC","UFBA","UFPE","UFRGS","UFSC"
-  ];
-  const sample = [];
-  states.forEach(uf => {
-    for (let y = 2015; y <= 2022; y++) {
-      const n = Math.floor(Math.random() * 150) + 50;
-      for (let i = 0; i < n; i++) {
-        sample.push({
-          UF_BENEFICIARIO_BOLSA: uf,
-          ANO_CONCESSAO_BOLSA: y,
-          NOME_TURNO_CURSO_BOLSA: turnos[Math.floor(Math.random() * turnos.length)],
-          TIPO_BOLSA: tiposBeca[Math.floor(Math.random() * tiposBeca.length)],
-          SEXO_BENEFICIARIO_BOLSA: generos[Math.floor(Math.random() * generos.length)],
-          RACA_BENEFICIARIO_BOLSA: etnias[Math.floor(Math.random() * etnias.length)],
-          NOME_IES_BOLSA: universidades[Math.floor(Math.random() * universidades.length)]
-        });
-      }
-    }
-  });
-  console.log(`🤖 Datos de muestra generados: ${sample.length} registros`);
-  return sample;
-}
-
-// Agrega un botón flotante para depurar en runtime
+/**
+ * Agrega un botón de depuración para inspeccionar estado interno en runtime
+ */
 function addDebugButton() {
   const btn = document.createElement("button");
-  btn.textContent = "Depurar Datos";
+  btn.textContent = "🛠 Debug";
   Object.assign(btn.style, {
-    position: "fixed", bottom: "10px", right: "10px",
-    padding: "6px 12px", background: "#fff", border: "1px solid #ccc",
-    cursor: "pointer", zIndex: 1000
+    position: "fixed",
+    bottom: "12px",
+    right: "12px",
+    padding: "6px 10px",
+    background: "#fff",
+    border: "1px solid #ccc",
+    cursor: "pointer",
+    zIndex: 1000
   });
   btn.addEventListener("click", () => {
-    const filteredCount = globalData.filter(d =>
-      d.UF_BENEFICIARIO_BOLSA === selectedState &&
-      d.ANO_CONCESSAO_BOLSA == selectedYear
-    ).length;
-    console.log("🛠️ Debug:", {
-      geoDataExists: !!geoData,
-      totalRecords: globalData.length,
-      filteredCount,
-      selected: { selectedState, selectedYear, selectedCategory }
-    });
-    alert(`Debug info:\n• GeoData: ${geoData? "sí":"no"}\n• Total: ${globalData.length}\n• Filtrados: ${filteredCount}`);
+    alert(`Debug info:
+• geoData cargado: ${!!geoData}
+• Registros totales: ${globalData.length}
+• Estado seleccionado: ${selectedState}
+• Año seleccionado: ${selectedYear}
+• Columnas detectadas: UF='${ufKey}', Año='${anoKey}'`);
+    console.log({ globalData, selectedState, selectedYear, ufKey, anoKey });
   });
   document.body.appendChild(btn);
 }
