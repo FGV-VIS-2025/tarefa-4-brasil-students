@@ -3,15 +3,15 @@
 /**
  * Actualiza el gráfico de barras de “estudiantes por turno”
  * @param {Array<Object>} data  – Array con todos los registros CSV
- * @param {string} state        – Código del estado seleccionado (ej. "RS")
- * @param {string|number} year  – Año seleccionado (ej. 2015)
+ * @param {string} state        – Código del estado seleccionado (ej. "MT")
+ * @param {string|number} year  – Año seleccionado (ej. "2015")
  */
 function updateBarChart(data, state, year) {
-    // 1) Selecciona el contenedor y limpia contenido previo
     const container = d3.select("#bar-chart");
+    // 1) Limpia cualquier gráfico o placeholder previo
     container.selectAll("*").remove();
   
-    // 2) Si no hay estado, muestra placeholder
+    // 2) Si no hay estado seleccionado, muestro mensaje
     if (!state) {
       container
         .append("div")
@@ -22,12 +22,13 @@ function updateBarChart(data, state, year) {
       return;
     }
   
-    // 3) Filtrar por estado y año
+    // 3) Filtro los datos usando ufKey y anoKey detectados en main.js
+    const yearNum = +year;
     const filtered = data.filter(
-      d => d.UF_BENEFICIARIO_BOLSA === state && d.ANO_CONCESSAO_BOLSA == year
+      d => d[ufKey] === state && d[anoKey] === yearNum
     );
   
-    // 4) Si filtrado vacío, aviso
+    // 4) Si no hay registros, muestro placeholder de “sin datos”
     if (filtered.length === 0) {
       container
         .append("div")
@@ -38,21 +39,21 @@ function updateBarChart(data, state, year) {
       return;
     }
   
-    // 5) Agrupar y contar por turno
+    // 5) Agrupo y cuento la cantidad de estudiantes por turno
     const rollup = d3.rollup(
       filtered,
       v => v.length,
       d => d.NOME_TURNO_CURSO_BOLSA
     );
     const entries = Array.from(rollup, ([turno, count]) => ({ turno, count }))
-                        .sort((a, b) => b.count - a.count);
+                         .sort((a, b) => b.count - a.count);
   
-    // 6) Márgenes y dimensiones
-    const margin = { top: 20, right: 20, bottom: 60, left: 50 };
+    // 6) Defino márgenes y dimensiones
+    const margin = { top: 20, right: 20, bottom: 70, left: 50 };
     const width  = container.node().clientWidth - margin.left - margin.right;
     const height = 300 - margin.top - margin.bottom;
   
-    // 7) Crear SVG
+    // 7) Creo el SVG
     const svg = container
       .append("svg")
         .attr("width",  width  + margin.left + margin.right)
@@ -71,7 +72,7 @@ function updateBarChart(data, state, year) {
       .nice()
       .range([height, 0]);
   
-    // 9) Dibujar ejes
+    // 9) Ejes
     svg.append("g")
         .attr("transform", `translate(0,${height})`)
         .call(d3.axisBottom(x))
@@ -82,7 +83,7 @@ function updateBarChart(data, state, year) {
     svg.append("g")
         .call(d3.axisLeft(y));
   
-    // 10) Dibujar las barras
+    // 10) Barras
     svg.selectAll(".bar")
       .data(entries)
       .enter()
