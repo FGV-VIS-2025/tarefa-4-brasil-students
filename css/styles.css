@@ -1,0 +1,71 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Tipografía global */
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    line-height: 1.5;
+  }
+  
+  /* Contenedor principal */
+  main {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+  }
+  
+  /* Controles */
+  .controls,
+  .slider {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  label {
+    font-weight: 600;
+    margin-right: 0.5rem;
+  }
+  
+  select,
+  input[type="range"] {
+    padding: 0.2rem;
+    font-size: 1rem;
+  }
+  
+  /* Mapa */
+  svg {
+    width: 100%;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+  }
+  
+  /* Tooltip global (en caso de usar CSS global) */
+  .tooltip {
+    position: absolute;
+    background: #fff;
+    border: 1px solid #666;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    pointer-events: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    max-width: 200px;
+    z-index: 10;
+  }
