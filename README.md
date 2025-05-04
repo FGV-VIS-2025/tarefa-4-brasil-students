@@ -16,7 +16,7 @@ Previamente ao projeto no Visual Studio, foram feitos esboços para se ter uma i
 
 **Sobre a visualização**
 
-A visualização interativa pode ser acessada no link do projeto.
+A visualização interativa pode ser acessada no [link](https://fgv-vis-2025.github.io/tarefa-4-brasil-students/) do projeto.
 
 **Processo de Desenvolvimento**:
 
