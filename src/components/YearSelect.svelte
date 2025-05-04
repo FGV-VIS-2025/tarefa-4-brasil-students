@@ -4,7 +4,9 @@
   </script>
   
   <select bind:value={year}>
+    <option value="">Todos</option>
     {#each years as y}
       <option value={y}>{y}</option>
     {/each}
   </select>
+  

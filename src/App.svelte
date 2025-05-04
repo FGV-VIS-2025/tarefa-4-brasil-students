@@ -36,7 +36,7 @@
     ];
   
     // Estado reactivo: año y sigla seleccionada
-    let year = 2014;
+    let year = '';
     let selectedState = '';
   </script>
   
