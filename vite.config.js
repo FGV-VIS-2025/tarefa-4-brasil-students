@@ -1,13 +1,16 @@
-import { defineConfig } from 'vite'
-import { svelte } from '@sveltejs/vite-plugin-svelte'
+import { defineConfig } from 'vite';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
 
 export default defineConfig({
-  // debe coincidir con tu repo name
+  plugins: [svelte()],
   base: '/tarefa-4-brasil-students/',
-
-  plugins: [ svelte() ],
-
-  build: {
-    outDir: 'docs'      // opcional: para servir desde /docs en main
+  server: {
+    port: 3000,
+    open: true
+  },
+  resolve: {
+    alias: {
+      '@': '/src'
+    }
   }
-})
+});
