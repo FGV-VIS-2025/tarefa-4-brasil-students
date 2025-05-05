@@ -22,5 +22,5 @@ A visualização interativa pode ser acessada no [link](https://fgv-vis-2025.git
 
 Foram realizadas diversas atividades, como a busca e seleção do dataset, a elaboração dos esboços de visualização, o design no Visual Studio Code e os testes de demonstração. Adicionalmente, foram implementadas as melhorias de design sugeridas em aula.
 
-### ***Sobre a avaliação por pares***:
+### **Sobre a avaliação por pares**:
 As observações feitas pela revisão foram levadas em consideração, melhorando a organização e os conceitos visualizáveis neste projeto.
