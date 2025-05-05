@@ -12,7 +12,7 @@ Este projeto busca analisar e visualizar a evolução da quantidade de bolsas co
 
 Para o projeto, foram utilizados dois datasets principais: um dataset denominado “brasil-students-scholarship-prouni-20052019”, que contém os dados de 2005 a 2019; e outro dataset chamado “brasil-states.geojson” com informações geoespaciais. Cabe ressaltar que, no primeiro dataset, a informação utilizada compreende os anos de 2014 a 2019, sendo empregada a biblioteca Pandas do Python com base em um Notebook.
 
-Previamente ao projeto no Visual Studio, foram feitos esboços para se ter uma ideia clara do panorama da visualização. Em seguida, considerando as sugestões comentadas em aula e utilizando as bibliotecas fornecidas nos últimos laboratórios, estes foram usados para criar os elementos visuais interativos.
+Previamente ao projeto no Visual Studio, foram feitos esboços para se ter uma ideia clara do panorama da visualização. Em seguida, considerando as sugestões comentadas em aula e utilizando as bibliotecas fornecidas nos últimos laboratórios, estes foram usados para criar os elementos visuais interativos. Em alguns casos, foi necessário revisar ferramentas de IA para reforçar alguns conceitos desconhecidos.
 
 ### **Sobre a visualização**
 
@@ -21,3 +21,6 @@ A visualização interativa pode ser acessada no [link](https://fgv-vis-2025.git
 ### **Processo de Desenvolvimento**:
 
 Foram realizadas diversas atividades, como a busca e seleção do dataset, a elaboração dos esboços de visualização, o design no Visual Studio Code e os testes de demonstração. Adicionalmente, foram implementadas as melhorias de design sugeridas em aula.
+
+### ***Sobre a avaliação por pares***:
+As observações feitas pela revisão foram levadas em consideração, melhorando a organização e os conceitos visualizáveis neste projeto.
